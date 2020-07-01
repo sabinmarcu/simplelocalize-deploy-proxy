@@ -8,6 +8,10 @@ const ENDPOINT = process.env.ENDPOINT || '/trigger';
 
 const app = express();
 
+app.get('/', (req, res) => {
+  res.end(`Successfully deployed. Please use ${ENDPOINT} for github proxying`)
+});
+
 app.post(ENDPOINT, async (req, res) => {
   const {
     github_repo,
