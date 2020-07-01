@@ -1,3 +1,5 @@
+[![Heroku](https://heroku-badge.herokuapp.com/?app=github-deploy-proxy]
+
 # github-deploy-proxy
 
 This package acts as a simple proxy for github `dispatch_event`
