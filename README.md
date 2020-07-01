@@ -1,4 +1,4 @@
-[![Heroku](https://heroku-badge.herokuapp.com/?app=github-deploy-proxy)]
+![Heroku](https://heroku-badge.herokuapp.com/?app=github-deploy-proxy)
 
 # github-deploy-proxy
 
