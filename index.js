@@ -14,37 +14,45 @@ app.get('/', (req, res) => {
 
 app.post(ENDPOINT, async (req, res) => {
   const {
-    github_repo,
     github_token,
+    githubtoken,
+    github_repo,
+    githubrepo,
     github_user,
+    githubuser,
     event_type,
+    eventtype,
   } = req.headers;
-  if (!github_token) {
+  const token = github_token || githubtoken;
+  const repo = github_repo || githubrepo;
+  const user = github_user || githubuser;
+  const type = event_type || eventtype || 'deploy';
+  if (!token) {
     res.status(403).json({
       success: false,
-      reason: 'Token is missing (github_token)',
+      reason: 'Token is missing (github_token / githubtoken)',
       extra: 'Be aware that the token must have write permissions for the repo',
     });
   }
-  if (!github_user) {
+  if (!user) {
     res.status(403).json({
       success: false,
-      reason: 'User is missing (github_user)',
+      reason: 'User is missing (github_user / githubuser)',
     });
   }
-  if (!github_repo) {
+  if (!repo) {
     res.status(403).json({
       success: false,
-      reason: 'Repository is missing (github_repo)',
+      reason: 'Repository is missing (github_repo / githubrepo)',
     });
   }
   try {
-    const octokit = new Octokit({ auth: github_token });
+    const octokit = new Octokit({ auth: token });
 
-    const response = await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
-      owner: github_user,
-      repo: github_repo,
-      event_type: event_type || 'deploy',
+    const response = await octokit.request('POST /repos/{user}/{repo}/dispatches', {
+      user,
+      repo,
+      event_type: type,
     });
 
     res.json({ success: true, extra: response });
