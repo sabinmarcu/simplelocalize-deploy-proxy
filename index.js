@@ -28,6 +28,7 @@ app.post(ENDPOINT, async (req, res) => {
   const user = github_user || githubuser;
   const type = event_type || eventtype || 'deploy';
   if (!token) {
+    console.error('TOKEN MISSING');
     res.status(403).json({
       success: false,
       reason: 'Token is missing (github_token / githubtoken)',
@@ -35,12 +36,14 @@ app.post(ENDPOINT, async (req, res) => {
     });
   }
   if (!user) {
+    console.error('USER MISSING');
     res.status(403).json({
       success: false,
       reason: 'User is missing (github_user / githubuser)',
     });
   }
   if (!repo) {
+    console.error('REPO MISSING');
     res.status(403).json({
       success: false,
       reason: 'Repository is missing (github_repo / githubrepo)',
