@@ -9,7 +9,7 @@ const ENDPOINT = process.env.ENDPOINT || '/trigger';
 const app = express();
 
 app.get('/', (req, res) => {
-  res.end(`Successfully deployed. Please use ${ENDPOINT} for github proxying`)
+  res.end(`Successfully deployed. Please use ${ENDPOINT} for github proxying`);
 });
 
 app.post(ENDPOINT, async (req, res) => {
@@ -50,6 +50,12 @@ app.post(ENDPOINT, async (req, res) => {
     const octokit = new Octokit({ auth: token });
 
     const response = await octokit.request('POST /repos/{user}/{repo}/dispatches', {
+      user,
+      repo,
+      event_type: type,
+    });
+
+    console.log('Sent github request', 'POST /repos/{user}/{repo}/dispatches', {
       user,
       repo,
       event_type: type,
