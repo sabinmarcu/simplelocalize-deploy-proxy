@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 });
 
 app.post(ENDPOINT, async (req, res) => {
+  console.log('request received');
   const {
     github_token,
     githubtoken,
@@ -28,7 +29,7 @@ app.post(ENDPOINT, async (req, res) => {
   const user = github_user || githubuser;
   const type = event_type || eventtype || 'deploy';
   if (!token) {
-    console.error('TOKEN MISSING');
+    console.log('Token is missing');
     res.status(403).json({
       success: false,
       reason: 'Token is missing (github_token / githubtoken)',
@@ -36,14 +37,14 @@ app.post(ENDPOINT, async (req, res) => {
     });
   }
   if (!user) {
-    console.error('USER MISSING');
+    console.log('User is missing');
     res.status(403).json({
       success: false,
       reason: 'User is missing (github_user / githubuser)',
     });
   }
   if (!repo) {
-    console.error('REPO MISSING');
+    console.log('Repository is missing');
     res.status(403).json({
       success: false,
       reason: 'Repository is missing (github_repo / githubrepo)',
@@ -66,6 +67,7 @@ app.post(ENDPOINT, async (req, res) => {
 
     res.json({ success: true, extra: response });
   } catch (e) {
+    console.log('GH Error: ', e.message, e.stack);
     res.status(500).json({
       success: false,
       reason: 'API Error',
