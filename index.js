@@ -1,79 +1,64 @@
 /* eslint-disable camelcase */
+require('dotenv').config();
 
 const express = require('express');
-const { Octokit } = require('@octokit/core');
+const fetch = require('node-fetch');
 
 const PORT = process.env.PORT || 5000;
 const ENDPOINT = process.env.ENDPOINT || '/trigger';
 
 const app = express();
 
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.end(`Successfully deployed. Please use ${ENDPOINT} for github proxying`);
 });
 
-app.post(ENDPOINT, async (req, res) => {
+const token = process.env.GITHUB_TOKEN || process.env.GITHUBTOKEN;
+const repo = process.env.GITHUB_REPO || process.env.GITHUBREPO;
+const user = process.env.GITHUB_USER || process.env.GITHUBUSER;
+const type = process.env.EVENT_TYPE || process.env.EVENTTYPE || 'deploy';
+const source = process.env.SOURCE;
+if (!token) {
+  console.error('Token is missing (github_token / githubtoken)');
+  process.exit(1);
+}
+if (!user) {
+  console.error('User is missing (github_user / githubuser)');
+  process.exit(1);
+}
+if (!repo) {
+  console.error('Repository is missing (github_repo / githubrepo)');
+  process.exit(1);
+}
+if (!source) {
+  console.error('Endpoint is missing (github_repo / githubrepo)');
+  process.exit(1);
+}
+
+app.post(ENDPOINT, async (_, res) => {
   console.log('request received');
-  const {
-    github_token,
-    githubtoken,
-    github_repo,
-    githubrepo,
-    github_user,
-    githubuser,
-    event_type,
-    eventtype,
-  } = req.headers;
-  const token = github_token || githubtoken;
-  const repo = github_repo || githubrepo;
-  const user = github_user || githubuser;
-  const type = event_type || eventtype || 'deploy';
-  if (!token) {
-    console.log('Token is missing');
-    res.status(403).json({
-      success: false,
-      reason: 'Token is missing (github_token / githubtoken)',
-      extra: 'Be aware that the token must have write permissions for the repo',
-    });
-  }
-  if (!user) {
-    console.log('User is missing');
-    res.status(403).json({
-      success: false,
-      reason: 'User is missing (github_user / githubuser)',
-    });
-  }
-  if (!repo) {
-    console.log('Repository is missing');
-    res.status(403).json({
-      success: false,
-      reason: 'Repository is missing (github_repo / githubrepo)',
-    });
-  }
   try {
-    const octokit = new Octokit({ auth: token });
+    const request = {
+      EVENT_TYPE: type,
+      GITHUB_REPO: repo,
+      GITHUB_USER: user,
+      GITHUB_TOKEN: token,
+    };
 
-    const response = await octokit.request('POST /repos/{user}/{repo}/dispatches', {
-      user,
-      repo,
-      event_type: type,
-    });
+    console.log('Sent github request', `POST ${source}`, request);
+    const response = await fetch(
+      source,
+      {
+        method: 'POST',
+        headers: request,
+      },
+    );
 
-    console.log('Sent github request', 'POST /repos/{user}/{repo}/dispatches', {
-      user,
-      repo,
-      event_type: type,
-    });
+    console.log('Success!');
 
     res.json({ success: true, extra: response });
   } catch (e) {
-    console.log('GH Error: ', e.message, e.stack);
-    res.status(500).json({
-      success: false,
-      reason: 'API Error',
-      extra: e.message,
-      stack: e.stack,
-    });
+    console.error('Request failed', e.message, e.stack);
   }
 });
 

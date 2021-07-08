@@ -8,16 +8,20 @@
   "dependencies": {
     "@commitlint/cli": "^9.0.1",
     "@commitlint/config-conventional": "^9.0.1",
-    "@octokit/core": "^3.1.0",
+    "dotenv": "^10.0.0",
     "eslint": "7.2.0",
     "eslint-config-airbnb-base": "14.2.0",
     "eslint-plugin-import": "^2.21.2",
     "express": "^4.17.1",
-    "husky": "^4.2.5"
+    "husky": "^4.2.5",
+    "node-fetch": "^2.6.1"
   },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.10"
   }
 }
